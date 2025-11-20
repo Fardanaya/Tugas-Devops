@@ -1,34 +1,34 @@
-const nextJest = require('next/jest')
-
-const createJestConfig = nextJest({
-    // Provide the path to your Next.js app to load next.config.js and .env files
-    dir: './',
-})
-
-// Add any custom config to be passed to Jest
-const customJestConfig = {
-    setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
-    moduleNameMapper: {
-        // Handle module aliases (this will be automatically configured for you based on your tsconfig.json paths)
-        '^@/(.*)$': '<rootDir>/src/$1',
+module.exports = {
+    preset: 'ts-jest',
+    testEnvironment: 'jsdom',
+    transform: {
+        '^.+\\.(ts|tsx)$': 'ts-jest',
     },
-    testEnvironment: 'jest-environment-jsdom',
-    verbose: true,
+    moduleNameMapper: {
+        '^@/(.*)$': '<rootDir>/src/$1',
+        '^@components/(.*)$': '<rootDir>/src/components/$1',
+        '^@lib/(.*)$': '<rootDir>/src/lib/$1',
+        '^@app/(.*)$': '<rootDir>/src/app/$1',
+    },
+    setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+    testMatch: [
+        '<rootDir>/src/**/__tests__/**/*.(ts|tsx|js)',
+        '<rootDir>/src/**/*.test.(ts|tsx|js)',
+    ],
     reporters: [
         'default',
         ['jest-html-reporter', {
-            outputPath: 'test-report.html',
-            pageTitle: 'Cloudyrent Test Report',
+            pageTitle: 'Cloudyrent Master Data Unit Tests',
+            outputPath: './test-results/unit-tests.html',
             includeFailureMsg: true,
-            includeConsoleLog: true
-        }]
+            includeStackTrace: true,
+            includeSuiteFailure: true,
+            styleOverridePath: false,
+        }],
     ],
     collectCoverageFrom: [
-        'src/**/*.{js,jsx,ts,tsx}',
-        '!src/**/*.d.ts',
+        'src/lib/actions/*.ts',
     ],
     coverageReporters: ['text', 'lcov', 'html'],
-}
-
-// createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
-module.exports = createJestConfig(customJestConfig)
+    coverageDirectory: './test-results/coverage',
+};
