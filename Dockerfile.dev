@@ -1,0 +1,29 @@
+# Development Docker Image
+FROM oven/bun:1
+
+WORKDIR /app
+
+# Copy dependency files
+COPY package.json bun.lock ./
+
+# Install dependencies including dev dependencies
+RUN bun install
+
+# Copy all project files
+COPY . .
+
+# Set default environment variables for development
+ENV NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL:-http://localhost:54321}
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0}
+ENV NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-development_secret_key_here}
+ENV NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:3000}
+ENV NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=${NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME:-dummy}
+ENV NEXT_PUBLIC_LOCATIONIQ_API_KEY=${NEXT_PUBLIC_LOCATIONIQ_API_KEY:-dummy}
+ENV NEXT_PUBLIC_ENGAGE_SPOT_API_KEY=${NEXT_PUBLIC_ENGAGE_SPOT_API_KEY:-dummy}
+ENV NEXT_PUBLIC_ENGAGE_SPOT_DATA_REGION=${NEXT_PUBLIC_ENGAGE_SPOT_DATA_REGION:-us-west}
+
+# Expose port
+EXPOSE 3000
+
+# Run Next.js in development mode
+CMD ["bun", "run", "dev"]

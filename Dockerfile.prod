@@ -1,0 +1,38 @@
+# STEP 1: Install dependencies & build
+FROM oven/bun:1 AS builder
+
+WORKDIR /app
+
+# Copy dependency files
+COPY package.json bun.lock ./
+
+# Install dependencies
+RUN bun install
+
+# Load environment variables from .env file (copied in COPY . .)
+# Next.js will automatically load .env during build
+
+# Copy all project files
+COPY . .
+
+# Build Next.js app (disable Turbopack to avoid lightningcss binary issues)
+ENV TURBOPACK=0
+RUN bun run next build
+
+# STEP 2: Production Image
+FROM oven/bun:1
+
+WORKDIR /app
+
+# Copy built files & node_modules dari builder
+COPY --from=builder /app/package.json ./
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/next.config.ts ./next.config.ts
+
+# Expose port
+EXPOSE 3000
+
+# Jalankan Next.js via Bun
+CMD ["bun", "run", "next", "start"]
